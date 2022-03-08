@@ -72,6 +72,50 @@ export async function updateUser(id: number, partial: PartialUser) {
   return await res.json()
 }
 
+export async function listUsers({
+  search,
+  country_code: countryCode,
+  event_type: eventType,
+  limit,
+  after,
+  before,
+}: {
+  search?: string
+  country_code?: string
+  event_type?: string
+  limit?: string
+  after?: string
+  before?: string
+}): Promise<ListLeaderboardResponse | ApiError> {
+  const params = new URLSearchParams({
+    order_by: 'rank',
+  })
+  if (search) {
+    params.append('search', search)
+  }
+  if (countryCode) {
+    params.append('country_code', countryCode)
+  }
+  if (eventType) {
+    params.append('event_type', eventType)
+  }
+  if (after) {
+    params.append('after', after)
+  }
+  if (before) {
+    params.append('after', before)
+  }
+  if (after || before) {
+    params.append('order_by', 'rank')
+  }
+  if (limit) {
+    params.append('limit', limit)
+  }
+
+  const res = await fetch(`${API_URL}/users?${params.toString()}`)
+  return await res.json()
+}
+
 export async function listLeaderboard({
   search,
   country_code: countryCode,
