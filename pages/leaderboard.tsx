@@ -10,6 +10,10 @@ import BackToTop from 'components/BackToTop'
 import { Select } from 'components/Form/Select'
 import PageBanner from 'components/PageBanner'
 import { Toast, Alignment } from 'components/Toast'
+import NoResults from 'components/leaderboard/ImageNoResults'
+import LeaderboardRow from 'components/leaderboard/LeaderboardRow'
+import Loader from 'components/Loader'
+import CountdownTimer from 'components/leaderboard/CountdownTimer'
 
 import { countries, CountryWithCode } from 'data/countries'
 import { defaultErrorText } from 'utils/forms'
@@ -17,13 +21,9 @@ import useDebounce from 'hooks/useDebounce'
 import { LoginContext } from 'hooks/useLogin'
 import { useField } from 'hooks/useForm'
 import { useQueriedToast } from 'hooks/useToast'
+import { usePaginatedUsers } from 'hooks/usePaginatedUsers'
 
 import * as API from 'apiClient'
-import NoResults from 'components/leaderboard/ImageNoResults'
-import LeaderboardRow from 'components/leaderboard/LeaderboardRow'
-import Loader from 'components/Loader'
-
-import CountdownTimer from 'components/leaderboard/CountdownTimer'
 
 type Props = {
   loginContext: LoginContext
@@ -64,6 +64,8 @@ const FIELDS = {
 }
 const CTA = `Our incentivized testnet leaderboard shows you who the top point getters are for all-time score, miners, bug catchers, net promoters, node hosting, and more! Click someone’s user name to see a breakdown of their activity. Points are earned during weekly cycles which begin Monday, 12:00am UTC and end Sunday 11:59pm UTC.`
 
+const PAGINATION_LIMIT = 20
+
 export default function Leaderboard({ loginContext }: Props) {
   const { visible: $visible, message: $toast } = useQueriedToast({
     queryString: 'toast',
@@ -72,7 +74,9 @@ export default function Leaderboard({ loginContext }: Props) {
 
   const $country = useField(FIELDS.country)
   const $eventType = useField(FIELDS.eventType)
-  const [$users, $setUsers] = useState<ReadonlyArray<API.ApiUser>>([])
+  const [$userList, $setUserList] = useState<
+    API.ListLeaderboardResponse | undefined
+  >()
 
   // Search field hooks
   const [$search, $setSearch] = useState('')
@@ -91,14 +95,14 @@ export default function Leaderboard({ loginContext }: Props) {
       const eventType =
         eventTypeValue !== TOTAL_POINTS ? { event_type: eventTypeValue } : {}
 
-      const result = await API.listLeaderboard({
+      const result = await API.listUsers({
         search: $debouncedSearch,
         ...countrySearch,
         ...eventType,
       })
 
       if (!('error' in result)) {
-        $setUsers(result.data)
+        $setUserList(result)
       }
 
       $setSearching(false)
@@ -112,6 +116,19 @@ export default function Leaderboard({ loginContext }: Props) {
   const { checkLoggedIn, checkLoading } = loginContext
   const isLoggedIn = checkLoggedIn()
   const isLoading = checkLoading()
+
+  const { fetchPrevious, fetchNext, $hasPrevious, $hasNext } =
+    usePaginatedUsers(
+      PAGINATION_LIMIT,
+      $search,
+      $eventType?.value || '',
+      $country?.value || '',
+      $userList,
+      $setUserList
+    )
+  const users = $userList?.data || []
+  // eslint-disable-next-line no-console
+  console.log({ fetchPrevious, fetchNext, $hasPrevious, $hasNext, users })
 
   return isLoading ? (
     <Loader />
@@ -263,7 +280,7 @@ export default function Leaderboard({ loginContext }: Props) {
               'mb-4'
             )}
           >
-            {$users.length > 0 && (
+            {users.length > 0 && (
               <>
                 <div className={clsx('w-16', 'sm:w-24', 'hidden', 'md:inline')}>
                   RANK
@@ -279,10 +296,10 @@ export default function Leaderboard({ loginContext }: Props) {
           </div>
           {$searching ? (
             <Loader />
-          ) : $users.length === 0 ? (
+          ) : users.length === 0 ? (
             <NoResults />
           ) : (
-            $users.map(user => (
+            users.map(user => (
               <div className="mb-3" key={user.id}>
                 <Link href={`/users/${user.id}`}>
                   <a>

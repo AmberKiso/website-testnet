@@ -65,6 +65,10 @@ export type ListEventsResponse = {
 
 export type ListLeaderboardResponse = {
   data: ReadonlyArray<ApiUser>
+  metadata: {
+    has_next: boolean
+    has_previous: boolean
+  }
 }
 
 export type UserMetric = {

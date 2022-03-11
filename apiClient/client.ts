@@ -83,9 +83,9 @@ export async function listUsers({
   search?: string
   country_code?: string
   event_type?: string
-  limit?: string
-  after?: string
-  before?: string
+  limit?: number
+  after?: number
+  before?: number
 }): Promise<ListLeaderboardResponse | ApiError> {
   const params = new URLSearchParams({
     order_by: 'rank',
@@ -100,16 +100,13 @@ export async function listUsers({
     params.append('event_type', eventType)
   }
   if (after) {
-    params.append('after', after)
+    params.append('after', after.toString())
   }
   if (before) {
-    params.append('after', before)
-  }
-  if (after || before) {
-    params.append('order_by', 'rank')
+    params.append('before', before.toString())
   }
   if (limit) {
-    params.append('limit', limit)
+    params.append('limit', limit.toString())
   }
 
   const res = await fetch(`${API_URL}/users?${params.toString()}`)

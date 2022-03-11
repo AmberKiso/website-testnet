@@ -1,17 +1,21 @@
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 import * as API from 'apiClient'
 
-export function usePaginatedUsers(
-  userId: string,
-  limit: number,
-  users: API.ListLeaderboardResponse | undefined,
-  setUsers: Dispatch<SetStateAction<API.ListLeaderboardResponse | undefined>>
-): {
+type PaginatedUsers = {
   $hasPrevious: boolean
   $hasNext: boolean
   fetchPrevious: () => void
   fetchNext: () => void
-} {
+}
+
+export function usePaginatedUsers(
+  limit: number,
+  search: string,
+  eventType: string,
+  countryCode: string,
+  users: API.ListLeaderboardResponse | undefined,
+  setUsers: Dispatch<SetStateAction<API.ListLeaderboardResponse | undefined>>
+): PaginatedUsers {
   const $hasPrevious = useMemo(
     () => users?.metadata.has_previous ?? false,
     [users]
@@ -21,17 +25,25 @@ export function usePaginatedUsers(
   const fetchUsers = useCallback(
     async (id: number, direction: 'before' | 'after') => {
       const raw = { [direction]: id.toString() }
+
+      const countrySearch =
+        countryCode !== 'Global' ? { country_code: countryCode } : {}
+
+      const eventTypeData =
+        eventType !== 'Total Points' ? { event_type: eventType } : {}
+
       const result = await API.listUsers({
-        userId,
         limit,
         ...raw,
+        ...countrySearch,
+        ...eventTypeData,
       })
 
       if (!('error' in result)) {
         setUsers(result)
       }
     },
-    [setUsers, userId, limit]
+    [setUsers, limit, countryCode, eventType]
   )
 
   const fetchNext = useCallback(
