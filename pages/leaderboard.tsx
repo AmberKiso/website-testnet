@@ -14,6 +14,7 @@ import NoResults from 'components/leaderboard/ImageNoResults'
 import LeaderboardRow from 'components/leaderboard/LeaderboardRow'
 import Loader from 'components/Loader'
 import CountdownTimer from 'components/leaderboard/CountdownTimer'
+import PaginationButton from 'components/PaginationButton'
 
 import { countries, CountryWithCode } from 'data/countries'
 import { defaultErrorText } from 'utils/forms'
@@ -314,6 +315,21 @@ export default function Leaderboard({ loginContext }: Props) {
             ))
           )}
           <div className="mb-24"></div>
+          <div
+            className={clsx('flex', 'font-favorit', 'justify-center', 'mt-8')}
+          >
+            <div className={clsx('flex', 'gap-x-1.5')}>
+              <PaginationButton
+                disabled={!$hasPrevious}
+                onClick={fetchPrevious}
+              >{`<< Previous`}</PaginationButton>
+              <div>{`|`}</div>
+              <PaginationButton
+                disabled={!$hasNext}
+                onClick={fetchNext}
+              >{`Next >>`}</PaginationButton>
+            </div>
+          </div>
         </div>
       </main>
       <Footer />
