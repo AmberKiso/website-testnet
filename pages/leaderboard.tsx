@@ -128,8 +128,6 @@ export default function Leaderboard({ loginContext }: Props) {
       $setUserList
     )
   const users = $userList?.data || []
-  // eslint-disable-next-line no-console
-  console.log({ fetchPrevious, fetchNext, $hasPrevious, $hasNext, users })
 
   return isLoading ? (
     <Loader />

@@ -72,7 +72,14 @@ export async function updateUser(id: number, partial: PartialUser) {
   return await res.json()
 }
 
-export async function listUsers(data: {
+export async function listUsers({
+  search,
+  country_code: countryCode,
+  event_type: eventType,
+  limit = 3,
+  after,
+  before,
+}: {
   search?: string
   country_code?: string
   event_type?: string
@@ -80,16 +87,6 @@ export async function listUsers(data: {
   after?: number
   before?: number
 }): Promise<ListLeaderboardResponse | ApiError> {
-  // eslint-disable-next-line no-console
-  console.log(data)
-  const {
-    search,
-    country_code: countryCode,
-    event_type: eventType,
-    limit = 3,
-    after,
-    before,
-  } = data
   const params = new URLSearchParams({
     order_by: 'rank',
   })
@@ -112,31 +109,6 @@ export async function listUsers(data: {
     params.append('limit', limit.toString())
   }
 
-  const res = await fetch(`${API_URL}/users?${params.toString()}`)
-  return await res.json()
-}
-
-export async function listLeaderboard({
-  search,
-  country_code: countryCode,
-  event_type: eventType,
-}: {
-  search?: string
-  country_code?: string
-  event_type?: string
-} = {}): Promise<ListLeaderboardResponse | ApiError> {
-  const params = new URLSearchParams({
-    order_by: 'rank',
-  })
-  if (search) {
-    params.append('search', search)
-  }
-  if (countryCode) {
-    params.append('country_code', countryCode)
-  }
-  if (eventType) {
-    params.append('event_type', eventType)
-  }
   const res = await fetch(`${API_URL}/users?${params.toString()}`)
   return await res.json()
 }
