@@ -314,7 +314,6 @@ export default function Leaderboard({ loginContext }: Props) {
               </div>
             ))
           )}
-          <div className="mb-24"></div>
           <div
             className={clsx('flex', 'font-favorit', 'justify-center', 'mt-8')}
           >
@@ -331,6 +330,7 @@ export default function Leaderboard({ loginContext }: Props) {
             </div>
           </div>
         </div>
+        <div className="mb-24"></div>
       </main>
       <Footer />
     </div>
