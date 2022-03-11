@@ -97,6 +97,7 @@ export default function Leaderboard({ loginContext }: Props) {
         eventTypeValue !== TOTAL_POINTS ? { event_type: eventTypeValue } : {}
 
       const result = await API.listUsers({
+        limit: PAGINATION_LIMIT,
         search: $debouncedSearch,
         ...countrySearch,
         ...eventType,
