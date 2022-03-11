@@ -81,12 +81,12 @@ export async function listUsers(data: {
   before?: number
 }): Promise<ListLeaderboardResponse | ApiError> {
   // eslint-disable-next-line no-console
-  console.log({ data })
+  console.log(data)
   const {
     search,
     country_code: countryCode,
     event_type: eventType,
-    limit,
+    limit = 3,
     after,
     before,
   } = data
