@@ -72,14 +72,7 @@ export async function updateUser(id: number, partial: PartialUser) {
   return await res.json()
 }
 
-export async function listUsers({
-  search,
-  country_code: countryCode,
-  event_type: eventType,
-  limit,
-  after,
-  before,
-}: {
+export async function listUsers(data: {
   search?: string
   country_code?: string
   event_type?: string
@@ -87,6 +80,16 @@ export async function listUsers({
   after?: number
   before?: number
 }): Promise<ListLeaderboardResponse | ApiError> {
+  // eslint-disable-next-line no-console
+  console.log({ data })
+  const {
+    search,
+    country_code: countryCode,
+    event_type: eventType,
+    limit,
+    after,
+    before,
+  } = data
   const params = new URLSearchParams({
     order_by: 'rank',
   })
