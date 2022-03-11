@@ -76,7 +76,7 @@ export async function listUsers({
   search,
   country_code: countryCode,
   event_type: eventType,
-  limit,
+  limit = 3,
   after,
   before,
 }: {
